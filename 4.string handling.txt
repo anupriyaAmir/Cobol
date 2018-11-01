@@ -1,0 +1,57 @@
+ IDENTIFICATION DIVISION.
+       PROGRAM-ID. HELLO-WORLD.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT file1 ASSIGN TO 'string.txt'
+           ORGANIZATION is SEQUENTIAL.
+       DATA DIVISION.
+       FILE SECTION.
+       FD file1.
+       01 filedata.
+            05 names pic A(10).
+       WORKING-STORAGE SECTION.
+       01 ws-data.
+           05 ws-names pic A(10).
+
+       01 ws-eof pic A(2).
+       01 countchar pic 9(2).
+       01 STRING1 pic A(10).
+       01 STRING2 PIC A(10).
+       01 STRING3 PIC A(10).
+       01 ws-char pic a(1).
+       01 DESTINATION-STRING PIC A(70).
+        01 DESTINATION-STRING1 PIC A(70).
+       PROCEDURE DIVISION.
+       MAIN-PROCEDURE.
+           OPEN OUTPUT file1.
+
+           DISPLAY 'ENTER ANY STRING'.
+           ACCEPT STRING1.
+           DISPLAY 'ENTER THE CHARACTERS TO BE COUNTED'.
+           ACCEPT WS-CHAR.
+
+           INSPECT STRING1 TALLYING COUNTCHAR FOR ALL WS-CHAR.
+           DISPLAY COUNTCHAR.
+      *>      INSPECT STRING1 REPLACING ALL WS-CHAR BY '1'.
+      *>      DISPLAY STRING1.
+           MOVE STRING1 TO filedata.
+           DISPLAY 'ENTER TWO STRINGS'.
+           ACCEPT STRING2.
+           ACCEPT STRING3.
+        STRING STRING1 DELIMITED BY '-'
+          STRING2 DELIMITED BY '+'
+          STRING3 DELIMITED BY '*'
+         INTO DESTINATION-STRING       
+         WITH POINTER countCHAR
+        END-STRING.
+            DISPLAY DESTINATION-STRING.
+        DISPLAY 'ENTER A SENTENCE WITH THREE WORDS '.
+        ACCEPT DESTINATION-STRING1.
+        UNSTRING DESTINATION-STRING1 DELIMITED BY '-'
+        INTO STRING1 ,STRING2
+        END-UNSTRING. 
+            DISPLAY STRING1,STRING2.
+         CLOSE FILE1.
+           stop run.
+       END PROGRAM HELLO-WORLD.

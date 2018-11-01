@@ -1,0 +1,174 @@
+       IDENTIFICATION DIVISION.
+
+       PROGRAM-ID. seq.
+
+       ENVIRONMENT DIVISION.
+
+       INPUT-OUTPUT SECTION.
+
+       FILE-CONTROL.
+
+       SELECT STUDENT ASSIGN TO 'input.txt'
+
+       ORGANIZATION IS LINE SEQUENTIAL.
+
+       SELECT STUD ASSIGN TO 'sort.txt'
+
+            ORGANIZATION IS INDEXED
+
+            ACCESS MODE IS DYNAMIC
+
+            RECORD KEY IS STUDENT-ID.
+
+       DATA DIVISION.
+
+       FILE SECTION.
+
+       FD STUDENT.
+
+       01 STUDENT-FILE.
+
+       05 STUDENT-ID PIC 9(5).
+
+       05 NAME PIC A(25).
+
+       01 WS-STUDENT.
+
+       05 WS-STUDENT-ID PIC 9(5).
+
+       05 WS-NAME PIC A(25).
+
+       01 WS-EOF PIC A(1).
+
+       FD STUD.
+
+       01 STUD-FILE.
+
+       05 STUDENT-ID1 PIC 9(5).
+
+       05 NAME1 PIC A(25).
+
+       01 WS-STUDENT1.
+
+       05 WS-STUDENT-ID1 PIC 9(5).
+
+       05 WS-NAME1 PIC A(25).
+
+       WORKING-STORAGE SECTION.
+
+       01 WS-EOF-SW PIC A(1).
+
+       01 WS-C PIC 9(1) VALUE 0.
+
+       01 WS-S PIC 9(1).
+
+
+       PROCEDURE DIVISION.
+
+       OPEN OUTPUT STUDENT.
+
+       A-PARA.
+
+       DISPLAY "Enter the student regno and name".
+
+       ACCEPT WS-STUDENT-ID.
+
+       ACCEPT WS-NAME.
+
+         MOVE WS-STUDENT-ID to STUDENT-ID.
+
+         MOVE WS-NAME to NAME.
+
+         WRITE STUDENT-FILE
+
+         END-WRITE.
+
+         DISPLAY "Do you want to continue (y) ".
+
+         ACCEPT WS-EOF.
+
+         IF WS-EOF='y'
+
+         GO TO A-PARA.
+
+         CLOSE STUDENT.
+
+       END-PARA.
+
+       B-PARA.
+
+           DISPLAY "Enter record number".
+
+           ACCEPT WS-S.
+
+
+         OPEN INPUT STUDENT.
+
+         PERFORM UNTIL WS-EOF='Y'
+
+         ADD 1 TO WS-C
+
+         READ STUDENT INTO WS-STUDENT
+
+            AT END MOVE 'Y' TO WS-EOF
+
+         END-READ
+
+         IF WS-C=WS-S THEN
+
+             MOVE WS-STUDENT TO WS-STUDENT1
+
+             DISPLAY "RECORD from FILE2:"
+
+             DISPLAY WS-STUDENT1
+
+      *>    ELSE
+
+      *>            DISPLAY "Not FOUND"
+
+       END-PERFORM.
+
+       CLOSE STUDENT.
+
+       SUBTRACT 1 FROM WS-C.
+
+       DISPLAY "count records from FILE1 " WS-C.
+
+       END-PARA.
+
+       C-PARA.
+
+           ACCEPT WS-S.
+
+       OPEN INPUT STUDENT.
+
+       OPEN OUTPUT STUD.
+
+         PERFORM UNTIL WS-EOF='Y'
+
+         IF WS-C=3
+
+         READ STUDENT INTO WS-STUDENT
+
+            AT END MOVE 'Y' TO WS-EOF
+
+         END-READ
+
+         ELSE
+
+          DISPLAY "NOT FOUND"
+
+          ADD 1 TO WS-C
+
+       END-PERFORM.
+
+       CLOSE STUDENT.
+
+       CLOSE STUD.
+
+       END-PARA.
+
+
+           STOP RUN.
+
+       END PROGRAM seq.

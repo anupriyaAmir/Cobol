@@ -1,0 +1,132 @@
+       IDENTIFICATION DIVISION.
+
+       PROGRAM-ID. SORTSEARCH.
+
+
+       ENVIRONMENT DIVISION.
+
+
+       DATA DIVISION.
+
+
+       WORKING-STORAGE SECTION.
+
+
+       01 ARRAY.
+
+
+       02 A PIC A(4) OCCURS 20 TIMES.
+
+
+       77 S PIC A(4).
+
+
+       77 N PIC 9(2).
+
+
+       77 FLAG PIC 9(1) VALUE 0.
+
+
+       77 T PIC A(4).
+
+
+       77 I PIC 9(2).
+
+
+       77 J PIC 9(2).
+
+
+       77 P PIC ZZ9.
+
+
+       PROCEDURE DIVISION.
+
+
+       MAIN-PARA.
+
+
+           DISPLAY " ENTER ARRAY LENGTH ".
+
+
+           ACCEPT N.
+
+
+           MOVE N TO P.
+
+
+           DISPLAY " ENTER " P " ELEMENTS ".
+
+
+           PERFORM A-PARA VARYING I FROM 1 BY 1 UNTIL I > N
+
+
+           DISPLAY " ENTER THE SEARCH ELEMENT ".
+
+
+           ACCEPT S.
+
+
+           PERFORM X-PARA VARYING I FROM 1 BY 1 UNTIL I > N
+
+
+           DISPLAY " THE ASCENDING ORDER IS ".
+
+
+           PERFORM D-PARA VARYING I FROM 1 BY 1 UNTIL I > N
+
+
+           IF FLAG IS = 1 THEN
+
+
+               DISPLAY "Found the stirng"
+
+
+           ELSE
+
+
+               DISPLAY "Not found the string"
+
+
+           END-IF.
+
+
+           STOP RUN.
+
+
+       A-PARA.
+
+
+           ACCEPT A(I).
+
+
+       X-PARA.
+
+
+           PERFORM Y-PARA VARYING J FROM 1 BY 1 UNTIL J > N.
+
+
+       Y-PARA.
+
+
+           IF ( A(I) < A(J) )
+
+
+           MOVE A(I) TO T
+
+
+           MOVE A(J) TO A(I)
+
+
+           MOVE T TO A(J).
+
+
+       D-PARA.
+
+
+            IF A(I) IS = S
+
+               MOVE 1 TO FLAG.
+
+           DISPLAY A(I).
+
+       END PROGRAM SORTSEARCH.

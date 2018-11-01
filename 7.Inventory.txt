@@ -1,0 +1,120 @@
+   IDENTIFICATION DIVISION.
+           PROGRAM-ID. INVENTORY.
+           ENVIRONMENT DIVISION.
+           INPUT-OUTPUT SECTION.
+            FILE-CONTROL.
+           SELECT BANK ASSIGN TO DISK ORGANIZATION IS SEQUENTIAL.
+           DATA DIVISION.
+           FILE SECTION.
+           FD BANK
+           DATA RECORD B
+           LABEL RECORDS ARE STANDARD
+           VALUE OF FILE-ID IS "INVENT.TXT".
+           01 B.
+           02 CUST PIC X(20).
+           02 BALANCE PIC 9(3).
+           WORKING-STORAGE SECTION.
+           01 X.
+           02 NAME PIC X(20).
+           02 BAL PIC 9(3).
+           02 cc PIC X(7).
+           01 CHH PIC 9.
+           01 BAL1 PIC Z(10).
+           01 AMT PIC 9(10).
+           01 NUM1 PIC 9(10).
+           PROCEDURE DIVISION.
+           MAIN.
+           PERFORM SELECTION.
+           OPEN I-O BANK.
+           IF CHH = 1
+             PERFORM NEW-ACC
+           ELSE IF CHH = 2
+             perform DEPO
+           ELSE IF CHH = 3
+             PERFORM DRAW
+           ELSE IF CHH=4
+             PERFORM REPORT1
+           ELSE IF CHH=5
+               PERFORM VIEW-BAL
+           ELSE
+             CLOSE BANK
+             STOP RUN.
+           SELECTION.
+           DISPLAY "1.Add inventory.".
+           DISPLAY "2.add".
+           DISPLAY "3.Purchase".
+           DISPLAY "4.View report".
+           DISPLAY "5.View Product"
+           DISPLAY "6.Exit".
+           DISPLAY "Enter Your Choice".
+           ACCEPT CHH.
+           NEW-ACC.
+           DISPLAY "Enter Your Product Name".
+           ACCEPT NAME.
+           DISPLAY "Enter product quantity".
+           ACCEPT BAL.
+           IF BAL < 5
+             DISPLAY " Can't Able To Create stock please enter >5."
+           ELSE
+             MOVE NAME TO CUST
+             MOVE BAL TO BALANCE
+             CLOSE BANK
+             OPEN EXTEND BANK
+             WRITE B
+             DISPLAY "Product Added;"
+             GO TO FINALLY.
+           FINALLY.
+             CLOSE BANK; GO TO MAIN.
+
+           VIEW-BAL.
+           DISPLAY "Enter product name"; ACCEPT cc.
+           GO TO CHECK-BAL.
+           CHECK-BAL.
+           READ BANK AT END GO TO X1.
+           IF cc=CUST
+             MOVE BALANCE TO BAL1
+             DISPLAY "Your product qty:" BAL1
+             GO TO FINALLY.
+           GO TO CHECK-BAL.
+           X1.
+           DISPLAY "Invalid product".
+           GO TO FINALLY.
+           DRAW.
+           DISPLAY "Enter product name".
+           ACCEPT cc.
+           DISPLAY "Enter Qty".
+           ACCEPT AMT.
+           GO TO BAL-VIEW.
+           BAL-VIEW.
+           READ BANK AT END GO TO X1.
+           IF AMT < BALANCE THEN
+           MOVE BALANCE TO BAL, BAL1
+              COMPUTE BAL = BAL - AMT
+              MOVE BAL TO BALANCE, BAL1
+              REWRITE B
+              DISPLAY "Your Qty :" BAL1
+               GO TO FINALLY
+           ELSE
+              DISPLAY "You Can't Able to purchase "
+              GO TO FINALLY.
+           DEPO.
+           DISPLAY "Enter Product N"; ACCEPT cc.
+           DISPLAY "Enter Quantity"; ACCEPT AMT.
+           GO TO BAL-ENQ.
+           BAL-ENQ.
+           READ BANK AT END GO TO X1.
+           IF CUST = cc
+             MOVE BALANCE TO BAL
+             COMPUTE BAL = BAL + AMT
+             MOVE BAL TO BALANCE, BAL1
+             REWRITE B
+             DISPLAY " Your quantity : " BAL1
+             GO TO FINALLY.
+               GO TO BAL-ENQ.
+           REPORT1.
+           READ BANK AT END
+           DISPLAY "STOCK DETAILS".
+           DISPLAY  CUST BALANCE.
+           GO TO REPORT1
+           GO TO SELECTION.
+           END PROGRAM INVENTORY.

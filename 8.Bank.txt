@@ -1,0 +1,182 @@
+  IDENTIFICATION DIVISION.
+       PROGRAM-ID. BANK.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+            FILE-CONTROL.
+           SELECT BANK ASSIGN TO DISK ORGANIZATION IS SEQUENTIAL.
+       DATA DIVISION.
+       FILE SECTION.
+       FD BANK
+           DATA RECORD B
+           LABEL RECORDS ARE STANDARD
+           VALUE OF FILE-ID IS "BANK.TXT".
+       01 B.
+           02 ACCNO PIC 9(10).
+           02 CUST PIC X(20).
+           02 PWD PIC X(20).
+           02 ACCTYPE PIC X(8).
+           02 BALANCE PIC 9(10)V99.
+           02 ACC2 PIC 9(10).
+       WORKING-STORAGE SECTION.
+       01 X.
+           02 NUM PIC 9(10).
+           02 NAME PIC X(20).
+           02 PASS PIC X(20).
+           02 TYPE1 PIC X(8).
+           02 BAL PIC 9(10)V99.
+       01 CHH PIC 9.
+       01 BAL1 PIC Z(10).ZZ.
+       01 AMT PIC 9(10).
+       01 NUM1 PIC 9(10).
+       PROCEDURE DIVISION.
+       MAIN.
+           PERFORM SELECTION.
+           OPEN I-O BANK.
+           IF CHH = 1
+             PERFORM NEW-ACC
+             GO TO Acc-TYPE
+           ELSE IF CHH = 2
+             GO TO VIEW-BAL
+           ELSE IF CHH = 3
+             GO TO DRAW
+           ELSE IF CHH = 4
+             GO TO DEPO
+           ELSE IF CHH=6
+             GO TO PURCHASE
+           ELSE IF CHH=7
+             GO TO REPORT1
+           ELSE
+             CLOSE BANK
+             STOP RUN.
+       SELECTION.
+           DISPLAY "1.Create New Acc.".
+           DISPLAY "2.Show Balance".
+           DISPLAY "3.Withdraw".
+           DISPLAY "4.Deposit".
+           DISPLAY "6.fund transfer".
+           DISPLAY "5.Exit".
+           DISPLAY "7.View report".
+           DISPLAY "Enter Your Choice".
+           ACCEPT CHH.
+       NEW-ACC.
+           DISPLAY "Enter Your Name".
+           ACCEPT NAME.
+           DISPLAY "Enter Your PassWord".
+           ACCEPT PASS.
+       ACC-CREATE.
+           DISPLAY "Enter Min Balance Atleast Rs.500/-".
+           ACCEPT BAL.
+           IF BAL < 500
+             DISPLAY " Can't Able To Create Acc."
+           ELSE
+             MOVE NUM TO ACCNO
+             MOVE NAME TO CUST
+             MOVE PASS TO PWD
+             MOVE TYPE1 TO ACCTYPE
+             MOVE BAL TO BALANCE
+             CLOSE BANK
+             OPEN EXTEND BANK
+             WRITE B
+             DISPLAY "       Account Created;"
+             DISPLAY "       Your Acc No : " ACCNO.
+             GO TO FINALLY.
+       FINALLY.
+             CLOSE BANK; GO TO MAIN.
+       ACC-TYPE.
+           DISPLAY "Enter Your Acc Type".
+           DISPLAY "Savings".
+           DISPLAY "Fixed".
+           DISPLAY "Nominal".
+           ACCEPT CHH.
+           IF CHH = 1
+              MOVE "Savings" TO TYPE1
+           ELSE IF CHH = 2
+              MOVE "Fixed" TO TYPE1
+           ELSE
+               MOVE "Nominal" TO TYPE1.
+               COMPUTE NUM = 100.
+           PERFORM NUMB.
+       NUMB.
+           READ BANK AT END GO TO ACC-CREATE.
+           MOVE NUM TO ACCNO.
+           COMPUTE NUM = NUM + 1.
+           GO TO NUMB.
+       VIEW-BAL.
+           PERFORM NEW-ACC.
+           DISPLAY "Enter Acc No"; ACCEPT NUM.
+           GO TO CHECK-BAL.
+       CHECK-BAL.
+           READ BANK AT END GO TO X1.
+           IF ACCNO = NUM AND PWD = PASS
+             MOVE BALANCE TO BAL1
+             DISPLAY "        Your Balance : Rs." BAL1
+             GO TO FINALLY.
+           GO TO CHECK-BAL.
+       X1.
+           DISPLAY "          Invalid Account".
+           GO TO FINALLY.
+       DRAW.
+           PERFORM NEW-ACC.
+           DISPLAY "Enter Acc No"; ACCEPT NUM.
+           DISPLAY "Enter Withdrawable Element"; ACCEPT AMT.
+           GO TO BAL-VIEW.
+       BAL-VIEW.
+           READ BANK AT END GO TO X1.
+           IF PWD = PASS
+              MOVE BALANCE TO BAL, BAL1
+              COMPUTE BAL = BAL - AMT
+
+              PERFORM CHECK-MIN
+              GO TO FINALLY.
+           GO TO BAL-VIEW.
+       CHECK-MIN.
+           IF BAL < 500
+              DISPLAY "      You Can't Able to Withdraw "
+           ELSE
+              MOVE BAL TO BALANCE, BAL1
+              REWRITE B.
+           DISPLAY "        Your Balance : Rs." BAL1 "/-".
+       DEPO.
+           DISPLAY "Enter Acc NO"; ACCEPT NUM.
+           DISPLAY "Enter Amount"; ACCEPT AMT.
+           GO TO BAL-ENQ.
+       BAL-ENQ.
+           READ BANK AT END GO TO X1.
+           IF ACCNO = NUM
+             MOVE BALANCE TO BAL
+             COMPUTE BAL = BAL + AMT
+             MOVE BAL TO BALANCE, BAL1
+             REWRITE B
+             DISPLAY "        Your Balance : Rs." BAL1 "/-"
+             GO TO FINALLY.
+           GO TO BAL-ENQ.
+       PURCHASE.
+           PERFORM NEW-ACC.
+           DISPLAY "ENTER THE AMOUNT".
+           ACCEPT NUM1.
+           GO TO FUND.
+
+           GO TO TRANS.
+       FUND.
+           READ BANK AT END GO TO X1.
+           IF PWD = PASS
+              MOVE BALANCE TO BAL, BAL1
+              COMPUTE BAL=BAL - NUM1.
+              IF BAL < 500
+                DISPLAY "YOU CANNOT ABLE TO TRANSFER"
+              ELSE
+                MOVE BAL TO BALANCE, BAL1
+
+           DISPLAY "YOUR BALANCE IS:RS" BAL "/-".
+       TRANS.
+           PERFORM NEW-ACC.
+           DISPLAY "ENTER ACCNO".
+           ACCEPT NUM.
+           COMPUTE AMT=100.
+           GO TO BAL-ENQ.
+       REPORT1.
+           READ BANK AT END
+           DISPLAY "BANK DETAILS".
+
+           DISPLAY  ACCNO      CUST             ACCTYPE         BALANCE.
+           GO TO SELECTION.
